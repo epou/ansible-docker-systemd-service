@@ -4,11 +4,17 @@
     path: "{{ sysconf_dir }}/{{ container_name }}"
     state: absent
 
+- name: Check if {{ service_name }}.service exist
+  stat:
+    path: /etc/systemd/system/{{ service_name }}.service
+  register: service_file_exist
+
 - name: Disable and stop {{ container_name }}
   systemd:
-    name: '{{ service_name }}.service'
+    name: "{{ service_name }}.service"
     enabled: false
     state: stopped
+  when: service_file_exist.stat.exists
 
 - name: Remove unit {{ service_name }}.service
   file:
